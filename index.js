@@ -2,7 +2,7 @@ const { Telegraf, Markup } = require('telegraf');
 
 // Определение ссылок на каналы
 const channelLinks = {
-  channel5: '',
+  channel5: 'https://t.me/hentaikod18',
   channel4: 'https://t.me/h4ntdom',
   channel2: 'https://t.me/+zTgWgsgAYxA5NDdi',
   channel3: 'https://t.me/+i5ZtCwL7MQlmMTcy',
