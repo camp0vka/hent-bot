@@ -2,6 +2,7 @@ const { Telegraf, Markup } = require('telegraf');
 
 // Определение ссылок на каналы
 const channelLinks = {
+  channel5: '',
   channel4: 'https://t.me/h4ntdom',
   channel2: 'https://t.me/+zTgWgsgAYxA5NDdi',
   channel3: 'https://t.me/+i5ZtCwL7MQlmMTcy',
@@ -11,6 +12,7 @@ const channelLinks = {
 
 const token = '6169070291:AAFEyhFBLtnPqckLFSAvajx-oG1tB3qJUwI';
 const bot = new Telegraf(token);
+
 
 // Объект для хранения соответствия пользователь->реферальная ссылка
 const userRefMap = {};
@@ -57,6 +59,7 @@ bot.start(async (ctx) => {
       [Markup.button.url('Подписаться на Канал 2', channelLinks.channel2)],
       [Markup.button.url('Подписаться на Канал 3', channelLinks.channel3)],
       [Markup.button.url('Подписаться на Канал 4', channelLinks.channel4)],
+      [Markup.button.url('Подписаться на Канал 5', channelLinks.channel5)],
       // ... (добавьте кнопки для других каналов)
       [Markup.button.callback('Далее ➡️', 'next')],
     ]);
@@ -119,6 +122,40 @@ bot.command('getref', async (ctx) => {
   }
 });
 
+bot.command('setchannelrootadminmainmenyddda', async (ctx) => {
+  const keyboard = Markup.inlineKeyboard(
+    Object.keys(channelLinks).map((channel) =>
+      Markup.button.callback(`${channel}`, `edit_channel_${channel}`)
+    )
+  );
+
+  ctx.reply('Виберіть канал для зміни посилання:', keyboard);
+});
+
+// Обробник для кнопок зміни посилань на канали
+bot.action(/edit_channel_(.+)/, async (ctx) => {
+  const channel = ctx.match[1];
+
+  // Запитайте користувача про нове посилання
+  ctx.reply(`Введіть нове посилання для каналу ${channel}:`);
+
+  // Дочекайтеся відповіді користувача
+  bot.on('text', (ctx) => {
+    const newLink = ctx.message.text;
+
+    // Змініть посилання на канал у об'єкті channelLinks
+    channelLinks[channel] = newLink;
+
+    ctx.reply(`Посилання на канал ${channel} було оновлено.`);
+  });
+
+  // Скасуйте обробку подій через 1 хвилину (якщо користувач не відповів)
+  setTimeout(() => {
+    bot.off('text');
+    ctx.reply('Час для вводу нового посилання вийшов. Спробуйте ще раз команду /setchannel.');
+  }, 60000);
+});
+
 // Команда для удаления реферальной ссылки
 bot.command('delref', async (ctx) => {
   try {
@@ -143,6 +180,8 @@ bot.command('delref', async (ctx) => {
     // Обработка ошибки
   }
 });
+
+
 
 /// Действие "Далее"
 // Объявление объекта для отслеживания состояния каждого пользователя
