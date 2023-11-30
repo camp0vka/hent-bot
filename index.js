@@ -1,7 +1,7 @@
 const { Telegraf, Markup } = require('telegraf');
 
 // Определение ссылок на каналы
-const channelLinks = {
+let channelLinks ={
   channel5: 'https://t.me/hentaikod18',
   channel4: 'https://t.me/h4ntdom',
   channel2: 'https://t.me/+zTgWgsgAYxA5NDdi',
@@ -10,7 +10,7 @@ const channelLinks = {
   // Добавьте ссылки на другие каналы
 };
 
-const token = '6169070291:AAFEyhFBLtnPqckLFSAvajx-oG1tB3qJUwI';
+const token = '6816610025:AAFx7jsyK3_dS7yFjfHE0G4SFuqjADQvsEU';
 const bot = new Telegraf(token);
 
 
@@ -26,15 +26,59 @@ function generateRefId() {
   return Math.random().toString(36).substring(2, 15);
 }
 
+function generateInlineKeyboard() {
+  return Markup.inlineKeyboard([
+    [Markup.button.url('Канал 1', channelLinks.channel1)], 
+    [Markup.button.url('Канал 2', channelLinks.channel2)],
+    [Markup.button.url('Канал 3', channelLinks.channel3)],
+    [Markup.button.url('Канал 4', channelLinks.channel4)],
+    [Markup.button.url('Канал 5', channelLinks.channel5)],
+    // ... (добавьте кнопки для других каналов)
+    [Markup.button.callback('Далее ➡️', 'next')],
+  ]);
+}
+
+
+bot.command('invalidate_telegram_keyboard_cache', (ctx) => {
+  ctx.telegram.deleteWebhook();
+
+  ctx.reply('Кеш клавіатури скинуто! Натисніть будь-яку кнопку щоб побачити оновлення.');
+});
+
+bot.command('updatechannels', (ctx) => {
+
+  try {
+    // Отримуємо нові посилання 
+    const newChannels = ctx.message.text.split(' ').slice(1);
+
+    // Валідація
+    if(newChannels.length % 2 !== 0) {
+      throw new Error('Непарна кількість аргументів');
+    }
+
+    // Оновлення об'єкту channelLinks
+    for(let i = 0; i < newChannels.length; i+=2) {
+      const name = newChannels[i];
+      const link = newChannels[i+1];
+
+      channelLinks[name] = link; 
+    }
+
+    ctx.reply('Канали оновлено!');
+
+  } catch (err) {
+    
+    ctx.reply('Помилка оновлення каналів: ' + err.message);
+  }
+});
+
 bot.start(async (ctx) => {
   try {
     const refId = ctx.startPayload;
 
     if (refId) {
-      // Сохраняем связь между пользователем и его реферальной ссылкой
       userRefMap[ctx.from.id] = refId;
 
-      // Инициализируем данные для реферальной ссылки, если ее нет
       if (!refLinks[refId]) {
         refLinks[refId] = {
           userId: userId,
@@ -43,26 +87,14 @@ bot.start(async (ctx) => {
           reachedCode: 0,
           subscriptionMessageSent: false,
           codeEntered: false,
-          // Добавьте другие поля при необходимости
         };
       }
 
-      // Существующая логика
       refLinks[refId].transitions++;
-      //await ctx.replyWithHTML(`Вас пригласил: ${refLinks[refId].username}`);
       ctx.replyWithHTML(`🔞`);
     }
 
-    // Независимо от наличия refId, отображаем кнопки для подписки на каналы
-    const inlineKeyboard = Markup.inlineKeyboard([
-      [Markup.button.url('Подписаться на Канал 1', channelLinks.channel1)],
-      [Markup.button.url('Подписаться на Канал 2', channelLinks.channel2)],
-      [Markup.button.url('Подписаться на Канал 3', channelLinks.channel3)],
-      [Markup.button.url('Подписаться на Канал 4', channelLinks.channel4)],
-      [Markup.button.url('Подписаться на Канал 5', channelLinks.channel5)],
-      // ... (добавьте кнопки для других каналов)
-      [Markup.button.callback('Далее ➡️', 'next')],
-    ]);
+    const inlineKeyboard = generateInlineKeyboard();
 
     ctx.reply('⬇ Для начала подпишитесь на каналы, затем нажмите "Далее":', inlineKeyboard);
   } catch (error) {
@@ -122,40 +154,6 @@ bot.command('getref', async (ctx) => {
   }
 });
 
-bot.command('setchannelrootadminmainmenyddda', async (ctx) => {
-  const keyboard = Markup.inlineKeyboard(
-    Object.keys(channelLinks).map((channel) =>
-      Markup.button.callback(`${channel}`, `edit_channel_${channel}`)
-    )
-  );
-
-  ctx.reply('Виберіть канал для зміни посилання:', keyboard);
-});
-
-// Обробник для кнопок зміни посилань на канали
-bot.action(/edit_channel_(.+)/, async (ctx) => {
-  const channel = ctx.match[1];
-
-  // Запитайте користувача про нове посилання
-  ctx.reply(`Введіть нове посилання для каналу ${channel}:`);
-
-  // Дочекайтеся відповіді користувача
-  bot.on('text', (ctx) => {
-    const newLink = ctx.message.text;
-
-    // Змініть посилання на канал у об'єкті channelLinks
-    channelLinks[channel] = newLink;
-
-    ctx.reply(`Посилання на канал ${channel} було оновлено.`);
-  });
-
-  // Скасуйте обробку подій через 1 хвилину (якщо користувач не відповів)
-  setTimeout(() => {
-    bot.off('text');
-    ctx.reply('Час для вводу нового посилання вийшов. Спробуйте ще раз команду /setchannel.');
-  }, 60000);
-});
-
 // Команда для удаления реферальной ссылки
 bot.command('delref', async (ctx) => {
   try {
@@ -180,8 +178,6 @@ bot.command('delref', async (ctx) => {
     // Обработка ошибки
   }
 });
-
-
 
 /// Действие "Далее"
 // Объявление объекта для отслеживания состояния каждого пользователя
