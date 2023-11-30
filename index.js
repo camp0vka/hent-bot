@@ -10,7 +10,7 @@ let channelLinks ={
   // Добавьте ссылки на другие каналы
 };
 
-const token = '6816610025:AAFx7jsyK3_dS7yFjfHE0G4SFuqjADQvsEU';
+const token = '6169070291:AAFEyhFBLtnPqckLFSAvajx-oG1tB3qJUwI';
 const bot = new Telegraf(token);
 
 
