@@ -28,11 +28,11 @@ function generateRefId() {
 
 function generateInlineKeyboard() {
   return Markup.inlineKeyboard([
-    [Markup.button.url('Канал 1', channelLinks.channel1)], 
-    [Markup.button.url('Канал 2', channelLinks.channel2)],
-    [Markup.button.url('Канал 3', channelLinks.channel3)],
-    [Markup.button.url('Канал 4', channelLinks.channel4)],
-    [Markup.button.url('Канал 5', channelLinks.channel5)],
+    [Markup.button.url('❎Канал 1', channelLinks.channel1)], 
+    [Markup.button.url('❎Канал 2', channelLinks.channel2)],
+    [Markup.button.url('❎Канал 3', channelLinks.channel3)],
+    [Markup.button.url('❎Канал 4', channelLinks.channel4)],
+    [Markup.button.url('❎Канал 5', channelLinks.channel5)],
     // ... (добавьте кнопки для других каналов)
     [Markup.button.callback('Далее ➡️', 'next')],
   ]);
@@ -91,12 +91,12 @@ bot.start(async (ctx) => {
       }
 
       refLinks[refId].transitions++;
-      ctx.replyWithHTML(`🔞`);
+      ctx.replyWithHTML(``);
     }
 
     const inlineKeyboard = generateInlineKeyboard();
 
-    ctx.reply('⬇ Для начала подпишитесь на каналы, затем нажмите "Далее":', inlineKeyboard);
+    ctx.reply('⬇ Для начала подпишитесь на каналы, затем нажмите "Далее"☑️:', inlineKeyboard);
   } catch (error) {
     console.error('Ошибка обработки команды /start:', error);
   }
@@ -110,8 +110,8 @@ bot.command('refs', async (ctx) => {
     const { userId, transitions, reachedCode } = refLinks[refId];
 
     message += `https://t.me/${ctx.botInfo.username}?start=${refId}\n`;
-    message += `- Переходов: ${transitions}\n`;
-    message += `- Подписалось: ${reachedCode}\n\n`;
+    message += `-🧙Переходов: ${transitions}\n`;
+    message += `-💲Подписалось: ${reachedCode}\n\n`;
   });
 
   await ctx.replyWithHTML(message);
@@ -210,12 +210,12 @@ bot.action('next', async (ctx) => {
 
           // Вывод сообщения о вводе кода  
           
-          ctx.reply('Введите код');
+          ctx.reply('Введите код: 🎉');
         } else {
-          ctx.reply('Ошибка: Нет данных о реферальной ссылке');
+          ctx.reply('Введите код: 🎉');
         }
       } else {
-        ctx.reply('Ошибка: Нет привязанной реферальной ссылки для этого пользователя');
+        ctx.reply('Введите код: 🎉');
       }
     }
   }
@@ -231,7 +231,6 @@ function sendTextWithButton(ctx, text, buttonLabel, buttonUrl) {
   ctx.replyWithMarkdown(`${text}\n\n[СМОТРЕТЬ🌟 ](${buttonUrl})`, { reply_markup: inlineKeyboard });
 }
 
-// Массив объектов с кейсами
 // Массив объектов с кейсами
 const cases = [
   {

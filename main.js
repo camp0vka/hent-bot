@@ -292,10 +292,6 @@ cases.forEach((item) => {
   });
 });
 
-bot.launch().catch((error) => {
-    console.log(error); // выведет ошибку запуска
-  })
-
 // Запуск бота
 bot.launch().then(() => {
   console.log('Бот запущен');
